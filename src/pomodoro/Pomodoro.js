@@ -1,117 +1,111 @@
 import React, { useState } from "react";
-import DisplayTimer from "./DisplayTimer"
+import DisplayTimer from "./DisplayTimer";
 import classNames from "../utils/class-names";
 import useInterval from "../utils/useInterval";
-import { minutesToDuration, secondsToDuration } from "../utils/duration/index.js"
+import { minutesToDuration } from "../utils/duration/index.js";
 
 export default function Pomodoro() {
   // All managed States
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [stopped, setStopped] = useState(false)
-  const [paused, setPaused] = useState(false)
-  const [focusTime, setfocusTime] = useState(25)
-  const [breakTime, setBreakTime] = useState(5)
-  const [focusTimeDisplay, setFocusTimeDisplay] = useState("25:00")
-  const [breakTimeDisplay, setBreakTimeDisplay] = useState("05:00")
-  const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
-  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
-  const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
-  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
-  const [valueNow, setValueNow] = useState(0)
-  const [percentage, setPercentage] = useState(`${valueNow}%`)
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [pomodoro, setPomodoro] = useState({
+    stopped: false,
+    paused: false,
+    focusTime: 25,
+    breakTime: 5,
+    breakTimeInSeconds: 5 * 60,
+    timeInSeconds: 25 * 60,
+    valueNow: 0,
+    percentage: `${0}%`,
+  });
 
-  // Generic functions to make it easier to call on certain changes multiple times
-  const timePercentage = (currentTime, absoluteTime) => setValueNow(100 -(currentTime * 100) / (absoluteTime * 60))
-  const secondsBreakDisplay = (time) => setBreakTimeInSecondsDisplay(secondsToDuration(time))
-  const secondsTimerDisplay = (time) => setTimeInSecondsDisplay(secondsToDuration(time))
-  const focusTimeTimeDisplay = (time) => setFocusTimeDisplay(minutesToDuration(time))
-  const breakTimerDisplay = (time) => setBreakTimeDisplay(minutesToDuration(time))
-  const shouldDisable = (state) => state ? true : false
-  const convertTimeToSeconds = (time) => time * 60
-  const disableButtons = isTimerRunning || paused
-
-  // Button functions for increase and decrease
-  // Focustimer buttons
-  const FocusButtonIncrease = () => {
-    let newTime = Math.min(60, focusTime + 5)
-    setfocusTime(newTime)
-    focusTimeTimeDisplay(newTime)
-    secondsTimerDisplay(newTime)
-  }
-
-  const FocusButtonDecrease = () => {
-    let newTime = Math.max(5, focusTime - 5)
-    setfocusTime(newTime)
-    focusTimeTimeDisplay(newTime)
-    secondsTimerDisplay(newTime)
-  }
+  const pushVar = (values) => {
+    setPomodoro({ ...pomodoro, ...values });
+  };
+  const shouldDisable = (state) => (state ? true : false);
+  const disableButtons = isTimerRunning || pomodoro.paused;
 
   // Breaktimer Buttons
-  const breaktimeButtonIncrease = () => {
-    let newTime = Math.min(15, breakTime + 1)
-    setBreakTime(newTime)
-    breakTimerDisplay(newTime)
-    secondsBreakDisplay(newTime)
-  }
-  const breaktimeButtondecrease = () => {
-    let newTime = Math.max(1, breakTime - 1)
-    setBreakTime(newTime)
-    breakTimerDisplay(newTime)
-    secondsBreakDisplay(newTime)
-  }
+  const tenaryButton = (operation, vars) => {
+    let baseTime = vars ? pomodoro.breakTime : pomodoro.focusTime;
+    let increment = vars ? 1 : 5;
+    let [max, min] = vars ? [1, 15] : [5, 60];
+    let newTime = operation
+      ? Math.min(min, baseTime + increment)
+      : Math.max(max, baseTime - increment);
+    let newObj = vars
+      ? {
+          breakTime: newTime,
+          breakTimeInSeconds: newTime * 60,
+        }
+      : {
+          focusTime: newTime,
+          timeInSeconds: newTime * 60,
+        };
+    pushVar(newObj);
+  };
 
   // Function for the play and pause button
   function playPause() {
     setIsTimerRunning((prevState) => !prevState);
-    if (!isTimerRunning && !paused) {
-      setTimeinSeconds(convertTimeToSeconds(focusTime))
-      setbreakTimeInSeconds(convertTimeToSeconds(breakTime))
+    if (!isTimerRunning && !pomodoro.paused) {
+      pushVar({
+        timeinSeconds: pomodoro.focusTime * 60,
+        breakTimeInSeconds: pomodoro.breakTime * 60,
+      });
     }
-    if (!isTimerRunning) setPaused(true)
-    setStopped(false)
+    if (!isTimerRunning) {
+      pushVar({ paused: true, stopped: false });
+    }
   }
 
   // stop Button function
   const stopButton = () => {
-    setStopped(true)
-    setIsTimerRunning(false)
-    setPaused(false)
-  }
+    setIsTimerRunning(false);
+    pushVar({
+      stopped: true,
+      paused: false,
+      timeInSeconds: pomodoro.focusTime * 60,
+    });
+  };
 
   // Main logic behind the timer
   const runTimer = () => {
-    if (isTimerRunning && paused && timeInSeconds > 0) {
-    const newTime = timeInSeconds - 1
-    setTimeinSeconds(newTime)
-    secondsTimerDisplay(newTime)
-    timePercentage(newTime, focusTime)
-    setPercentage(`${valueNow}%`)
+    if (isTimerRunning && pomodoro.paused && pomodoro.timeInSeconds > 0) {
+      const newTime = pomodoro.timeInSeconds - 1;
+      pushVar({
+        timeInSeconds: newTime,
+        valueNow: 100 - (newTime * 100) / (pomodoro.focusTime * 60),
+        percentage: `${pomodoro.valueNow}%`,
+      });
       if (newTime === 0) {
-        new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        new Audio(
+          `${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`
+        ).play();
       }
-    } 
-    else if (breakTimeInSeconds > 0) {
-      const newBreakTime = breakTimeInSeconds - 1
-      setbreakTimeInSeconds(newBreakTime)
-      secondsBreakDisplay(newBreakTime)
-      timePercentage(newBreakTime, breakTime)
-      setPercentage(`${valueNow}%`)
+    } else if (pomodoro.breakTimeInSeconds > 0) {
+      const newBreakTime = pomodoro.breakTimeInSeconds - 1;
+      pushVar({
+        breakTimeInSeconds: newBreakTime,
+        valueNow: 100 - (newBreakTime * 100) / (pomodoro.breakTime * 60),
+        percentage: `${pomodoro.valueNow}%`,
+      });
       if (newBreakTime === 0) {
-        new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        new Audio(
+          `${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`
+        ).play();
       }
+    } else {
+      pushVar({
+        timeInSeconds: pomodoro.focusTime * 60,
+        breakTimeInSeconds: pomodoro.breakTime * 60,
+      });
     }
-    else {
-      setfocusTime(focusTime)
-      setBreakTime(breakTime)
-      setTimeinSeconds(focusTime)
-      setbreakTimeInSeconds(breakTime)
-    }
-  }
+  };
 
   // Kept it clean as requested only adding one function
   useInterval(
     () => {
-      runTimer()
+      runTimer();
     },
     isTimerRunning ? 1000 : null
   );
@@ -122,14 +116,14 @@ export default function Pomodoro() {
         <div className="col">
           <div className="input-group input-group-lg mb-2">
             <span className="input-group-text" data-testid="duration-focus">
-              Focus Duration: {focusTimeDisplay}
+              Focus Duration: {minutesToDuration(pomodoro.focusTime)}
             </span>
             <div className="input-group-append">
               <button
                 type="button"
                 className="btn btn-secondary"
                 data-testid="decrease-focus"
-                onClick={FocusButtonDecrease}
+                onClick={() => tenaryButton(false, false)}
                 disabled={shouldDisable(disableButtons)}
               >
                 <span className="oi oi-minus" />
@@ -138,7 +132,7 @@ export default function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="increase-focus"
-                onClick={FocusButtonIncrease}
+                onClick={() => tenaryButton(true, false)}
                 disabled={shouldDisable(disableButtons)}
               >
                 <span className="oi oi-plus" />
@@ -150,14 +144,14 @@ export default function Pomodoro() {
           <div className="float-right">
             <div className="input-group input-group-lg mb-2">
               <span className="input-group-text" data-testid="duration-break">
-                Break Duration: {breakTimeDisplay}
+                Break Duration: {minutesToDuration(pomodoro.breakTime)}
               </span>
               <div className="input-group-append">
                 <button
                   type="button"
                   className="btn btn-secondary"
                   data-testid="decrease-break"
-                  onClick={breaktimeButtondecrease}
+                  onClick={() => tenaryButton(false, true)}
                   disabled={shouldDisable(disableButtons)}
                 >
                   <span className="oi oi-minus" />
@@ -166,7 +160,7 @@ export default function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="increase-break"
-                  onClick={breaktimeButtonIncrease}
+                  onClick={() => tenaryButton(true, true)}
                   disabled={shouldDisable(disableButtons)}
                 >
                   <span className="oi oi-plus" />
@@ -210,18 +204,7 @@ export default function Pomodoro() {
           </div>
         </div>
       </div>
-      <DisplayTimer 
-        breakTimeInSecondsDisplay={breakTimeInSecondsDisplay}
-        timeInSecondsDisplay={timeInSecondsDisplay}
-        breakTimeInSeconds={breakTimeInSeconds}
-        focusTimeDisplay={focusTimeDisplay}
-        breakTimeDisplay={breakTimeDisplay}
-        timeInSeconds={timeInSeconds}
-        percentage={percentage}
-        valueNow={valueNow}
-        stopped={stopped}
-        paused={paused}
-        />
+      <DisplayTimer {...pomodoro} />
     </div>
   );
 }

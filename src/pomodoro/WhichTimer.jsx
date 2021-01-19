@@ -1,32 +1,36 @@
 import React from "react";
+import {
+  minutesToDuration,
+  secondsToDuration,
+} from "../utils/duration/index.js";
 
 export default function WhichTimer(props) {
   const {
-    breakTimeInSecondsDisplay,
-    timeInSecondsDisplay,
-    focusTimeDisplay,
-    breakTimeDisplay,
     timeInSeconds,
   } = props;
 
   // Conditional that chooses whether to display focus timer or break timer
-  return timeInSeconds !== 0 ? (
+  if (timeInSeconds !== 0) {
+    return (
     <div className="col">
       <h2 data-testid="session-title">
-        Focusing for {focusTimeDisplay} minutes
+        Focusing for {minutesToDuration(props.focusTime)} minutes
       </h2>
       <p className="lead" data-testid="session-sub-title">
-        {timeInSecondsDisplay} remaining
+        {secondsToDuration(props.timeInSeconds)} remaining
       </p>
     </div>
-  ) : (
+    )
+   } 
+   else { return (
     <div className="col">
       <h2 data-testid="session-title">
-        On Break for {breakTimeDisplay} minutes
+        On Break for {minutesToDuration(props.breakTime)} minutes
       </h2>
       <p className="lead" data-testid="session-sub-title">
-        {breakTimeInSecondsDisplay} remaining
+        {secondsToDuration(props.breakTimeInSeconds)} remaining
       </p>
     </div>
   );
+   }
 }
