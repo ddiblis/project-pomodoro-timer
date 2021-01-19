@@ -197,7 +197,18 @@ export default function Pomodoro() {
           </div>
         </div>
       </div>
-      <DisplayTimer timeInSeconds={timeInSeconds} focusTimeDisplay={focusTimeDisplay} timeInSecondsDisplay={timeInSecondsDisplay} breakTimeDisplay={breakTimeDisplay} breakTimeInSecondsDisplay={breakTimeInSecondsDisplay} valueNow={valueNow} percentage={percentage} stopped={stopped} paused={paused} breakTimeInSeconds={breakTimeInSeconds}/>
+      <DisplayTimer 
+        breakTimeInSecondsDisplay={breakTimeInSecondsDisplay}
+        timeInSecondsDisplay={timeInSecondsDisplay}
+        breakTimeInSeconds={breakTimeInSeconds}
+        focusTimeDisplay={focusTimeDisplay}
+        breakTimeDisplay={breakTimeDisplay}
+        timeInSeconds={timeInSeconds}
+        percentage={percentage}
+        valueNow={valueNow}
+        stopped={stopped}
+        paused={paused}
+        />
     </div>
   );
 }

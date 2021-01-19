@@ -243,7 +243,7 @@ describe("Pomodoro Timer", () => {
         "On Break for 01:00 minutes"
       );
     });
-    test('starts a new focus session after break session expires', () => {
+    test("starts a new focus session after break session expires", () => {
       const { getByTestId } = render(<Pomodoro />);
 
       // Set the times to the minimums
