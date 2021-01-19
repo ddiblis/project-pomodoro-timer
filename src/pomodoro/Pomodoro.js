@@ -6,19 +6,19 @@ import { minutesToDuration, secondsToDuration } from "../utils/duration/index.js
 
 export default function Pomodoro() {
   // All managed States
-  const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
-  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
-  const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
-  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
-  const [focusTimeDisplay, setFocusTimeDisplay] = useState("25:00")
-  const [breakTimeDisplay, setBreakTimeDisplay] = useState("05:00")
-  const [percentage, setPercentage] = useState(`${valueNow}%`)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [focusTime, setfocusTime] = useState(25)
-  const [breakTime, setBreakTime] = useState(5)
   const [stopped, setStopped] = useState(false)
   const [paused, setPaused] = useState(false)
+  const [focusTime, setfocusTime] = useState(25)
+  const [breakTime, setBreakTime] = useState(5)
+  const [focusTimeDisplay, setFocusTimeDisplay] = useState("25:00")
+  const [breakTimeDisplay, setBreakTimeDisplay] = useState("05:00")
+  const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
+  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
+  const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
+  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
   const [valueNow, setValueNow] = useState(0)
+  const [percentage, setPercentage] = useState(`${valueNow}%`)
 
   // Generic functions to make it easier to call on certain changes multiple times
   const timePercentage = (currentTime, absoluteTime) => setValueNow(100 -(currentTime * 100) / (absoluteTime * 60))
