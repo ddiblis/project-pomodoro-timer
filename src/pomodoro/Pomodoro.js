@@ -70,35 +70,31 @@ export default function Pomodoro() {
 
   // Main logic behind the timer
   const runTimer = () => {
-    if (isTimerRunning && pomodoro.paused && pomodoro.timeInSeconds > 0) {
-      const newTime = pomodoro.timeInSeconds - 1;
-      pushVar({
-        timeInSeconds: newTime,
-        valueNow: 100 - (newTime * 100) / (pomodoro.focusTime * 60),
-        percentage: `${pomodoro.valueNow}%`,
-      });
-      if (newTime === 0) {
-        new Audio(
-          `${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`
-        ).play();
-      }
-    } else if (pomodoro.breakTimeInSeconds > 0) {
-      const newBreakTime = pomodoro.breakTimeInSeconds - 1;
-      pushVar({
-        breakTimeInSeconds: newBreakTime,
-        valueNow: 100 - (newBreakTime * 100) / (pomodoro.breakTime * 60),
-        percentage: `${pomodoro.valueNow}%`,
-      });
-      if (newBreakTime === 0) {
-        new Audio(
-          `${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`
-        ).play();
-      }
-    } else {
-      pushVar({
-        timeInSeconds: pomodoro.focusTime * 60,
-        breakTimeInSeconds: pomodoro.breakTime * 60,
-      });
+    const newTime = pomodoro.timeInSeconds - 1;
+    const newBreakTime = pomodoro.breakTimeInSeconds - 1;
+    const runAudio = (!newTime | !newBreakTime) ? true : false
+    const newObj =
+      isTimerRunning && pomodoro.paused && pomodoro.timeInSeconds > 0
+        ? {
+            timeInSeconds: newTime,
+            valueNow: 100 - (newTime * 100) / (pomodoro.focusTime * 60),
+            percentage: `${pomodoro.valueNow}%`,
+          }
+        : pomodoro.breakTimeInSeconds > 0
+        ? {
+            breakTimeInSeconds: newBreakTime,
+            valueNow: 100 - (newBreakTime * 100) / (pomodoro.breakTime * 60),
+            percentage: `${pomodoro.valueNow}%`,
+          }
+        : {
+            timeInSeconds: pomodoro.focusTime * 60,
+            breakTimeInSeconds: pomodoro.breakTime * 60,
+          };
+    pushVar(newObj);
+    if (runAudio) {
+      new Audio(
+        `${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`
+      ).play();
     }
   };
 
