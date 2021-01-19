@@ -78,35 +78,39 @@ export default function Pomodoro() {
     setPaused(false)
   }
 
+  const runTimer = () => {
+    if (isTimerRunning && paused && timeInSeconds > 0) {
+    const newTime = timeInSeconds - 1
+    setTimeinSeconds(newTime)
+    secondsTimerDisplay(newTime)
+    timePercentage(newTime, focusTime)
+    setPercentage(`${valueNow}%`)
+      if (newTime === 0) {
+        new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+      }
+    } 
+    else if (breakTimeInSeconds > 0) {
+      const newBreakTime = breakTimeInSeconds - 1
+      setbreakTimeInSeconds(newBreakTime)
+      secondsBreakDisplay(newBreakTime)
+      timePercentage(newBreakTime, breakTime)
+      setPercentage(`${valueNow}%`)
+      if (newBreakTime === 0) {
+        new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+      }
+    }
+    else {
+      setfocusTime(focusTime)
+      setBreakTime(breakTime)
+      setTimeinSeconds(focusTime)
+      setbreakTimeInSeconds(breakTime)
+    }
+  }
+
   // Main logic behind counter
   useInterval(
     () => {
-      if (isTimerRunning && paused && timeInSeconds > 0) {
-      const newTime = timeInSeconds - 1
-      setTimeinSeconds(newTime)
-      secondsTimerDisplay(newTime)
-      timePercentage(newTime, focusTime)
-      setPercentage(`${valueNow}%`)
-        if (newTime === 0) {
-          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
-        }
-      } 
-      else if (breakTimeInSeconds > 0) {
-        const newBreakTime = breakTimeInSeconds - 1
-        setbreakTimeInSeconds(newBreakTime)
-        secondsBreakDisplay(newBreakTime)
-        timePercentage(newBreakTime, breakTime)
-        setPercentage(`${valueNow}%`)
-        if (newBreakTime === 0) {
-          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
-        }
-      }
-      else {
-        setfocusTime(focusTime)
-        setBreakTime(breakTime)
-        setTimeinSeconds(focusTime)
-        setbreakTimeInSeconds(breakTime)
-      }
+      runTimer()
     },
     isTimerRunning ? 1000 : null
   );
