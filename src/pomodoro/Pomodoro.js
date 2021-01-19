@@ -5,85 +5,26 @@ import useInterval from "../utils/useInterval";
 import { minutesToDuration, secondsToDuration } from "../utils/duration/index.js"
 
 export default function Pomodoro() {
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [stopped, setStopped] = useState(false)
-  const [paused, setPaused] = useState(false)
-  const [focusTime, setfocusTime] = useState(25)
-  const [breakTime, setBreakTime] = useState(5)
+  const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
+  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
+  const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
+  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
   const [focusTimeDisplay, setFocusTimeDisplay] = useState("25:00")
   const [breakTimeDisplay, setBreakTimeDisplay] = useState("05:00")
-  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
-  const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
-  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
-  const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
-  const [valueNow, setValueNow] = useState(0)
   const [percentage, setPercentage] = useState(`${valueNow}%`)
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [focusTime, setfocusTime] = useState(25)
+  const [breakTime, setBreakTime] = useState(5)
+  const [stopped, setStopped] = useState(false)
+  const [paused, setPaused] = useState(false)
+  const [valueNow, setValueNow] = useState(0)
 
-  // const initialStates = {
-  //   isTimerRunning: false,
-  //   paused: false,
-  //   stopped: false,
-  //   focusTime: 25,
-  //   breakTime: 5,
-  //   focusTimeDisplay: "25:00",
-  //   breakTimerDisplay: "5:00",
-  //   timeInSeconds: focusTime*60,
-  //   timeInSecondsDisplay: secondsToDuration(timeInSeconds),
-  //   breakTimeInSeconds: breakTime*60,
-  //   breakTimeInSecondsDisplay: secondsToDuration(breakTimeInSeconds),
-  //   valueNow: 0,
-  //   percentage: `${valueNow}%`
-  // }
-
-  // const [focusTimeData, setfocusTimeData] = useState({...initialStates})
-
-  // const handleChange = ({target}) => {
-  //   return setfocusTimeData({
-  //         ...focusTimeData,
-  //         [target.name]: target.value
-  //   })
-  // }
-
-
-
-
-  useInterval(
-    () => {
-      if (isTimerRunning && paused && timeInSeconds > 0) {
-      const newTime = timeInSeconds - 1
-      setTimeinSeconds(newTime)
-      secondsTimerDisplay(newTime)
-      timePercentage(newTime, focusTime)
-      setPercentage(`${valueNow}%`)
-        if (newTime === 0) {
-          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
-        }
-      } 
-      else if (breakTimeInSeconds > 0) {
-        const newBreakTime = breakTimeInSeconds - 1
-        setbreakTimeInSeconds(newBreakTime)
-        secondsBreakDisplay(newBreakTime)
-        timePercentage(newBreakTime, breakTime)
-        setPercentage(`${valueNow}%`)
-        if (newBreakTime === 0) {
-          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
-        }
-      }
-      else {
-        setfocusTime(focusTime)
-        setBreakTime(breakTime)
-        setTimeinSeconds(focusTime)
-        setbreakTimeInSeconds(breakTime)
-      }
-    },
-    isTimerRunning ? 1000 : null
-  );
-
+  const timePercentage = (currentTime, absoluteTime) => setValueNow(100 -(currentTime * 100) / (absoluteTime * 60))
+  const secondsBreakDisplay = (time) => setBreakTimeInSecondsDisplay(secondsToDuration(time))
+  const secondsTimerDisplay = (time) => setTimeInSecondsDisplay(secondsToDuration(time))
   const focusTimeTimeDisplay = (time) => setFocusTimeDisplay(minutesToDuration(time))
   const breakTimerDisplay = (time) => setBreakTimeDisplay(minutesToDuration(time))
-  const secondsTimerDisplay = (time) => setTimeInSecondsDisplay(secondsToDuration(time))
-  const secondsBreakDisplay = (time) => setBreakTimeInSecondsDisplay(secondsToDuration(time))
-  const timePercentage = (currentTime, absoluteTime) => setValueNow(100 -(currentTime * 100) / (absoluteTime * 60))
+  const shouldDisable = (state) => state ? true : false
   const convertTimeToSeconds = (time) => time * 60
   const disableButtons = isTimerRunning || paused
 
@@ -130,7 +71,37 @@ export default function Pomodoro() {
     setPaused(false)
   }
 
-  const shouldDisable = (state) => state ? true : false
+  useInterval(
+    () => {
+      if (isTimerRunning && paused && timeInSeconds > 0) {
+      const newTime = timeInSeconds - 1
+      setTimeinSeconds(newTime)
+      secondsTimerDisplay(newTime)
+      timePercentage(newTime, focusTime)
+      setPercentage(`${valueNow}%`)
+        if (newTime === 0) {
+          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        }
+      } 
+      else if (breakTimeInSeconds > 0) {
+        const newBreakTime = breakTimeInSeconds - 1
+        setbreakTimeInSeconds(newBreakTime)
+        secondsBreakDisplay(newBreakTime)
+        timePercentage(newBreakTime, breakTime)
+        setPercentage(`${valueNow}%`)
+        if (newBreakTime === 0) {
+          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        }
+      }
+      else {
+        setfocusTime(focusTime)
+        setBreakTime(breakTime)
+        setTimeinSeconds(focusTime)
+        setbreakTimeInSeconds(breakTime)
+      }
+    },
+    isTimerRunning ? 1000 : null
+  );
 
   return (
     <div className="pomodoro">
