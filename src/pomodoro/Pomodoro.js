@@ -78,6 +78,7 @@ export default function Pomodoro() {
     setPaused(false)
   }
 
+  // Main logic behind the timer
   const runTimer = () => {
     if (isTimerRunning && paused && timeInSeconds > 0) {
     const newTime = timeInSeconds - 1
@@ -107,7 +108,7 @@ export default function Pomodoro() {
     }
   }
 
-  // Main logic behind counter
+  // Kept it clean as requested only adding one function
   useInterval(
     () => {
       runTimer()
