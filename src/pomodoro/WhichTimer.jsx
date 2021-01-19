@@ -5,32 +5,26 @@ import {
 } from "../utils/duration/index.js";
 
 export default function WhichTimer(props) {
-  const {
-    timeInSeconds,
-  } = props;
+  const { breakTime, breakTimeInSeconds, focusTime, timeInSeconds } = props;
 
   // Conditional that chooses whether to display focus timer or break timer
-  if (timeInSeconds !== 0) {
-    return (
+  return timeInSeconds ? (
     <div className="col">
       <h2 data-testid="session-title">
-        Focusing for {minutesToDuration(props.focusTime)} minutes
+        Focusing for {minutesToDuration(focusTime)} minutes
       </h2>
       <p className="lead" data-testid="session-sub-title">
-        {secondsToDuration(props.timeInSeconds)} remaining
+        {secondsToDuration(timeInSeconds)} remaining
       </p>
     </div>
-    )
-   } 
-   else { return (
+  ) : (
     <div className="col">
       <h2 data-testid="session-title">
-        On Break for {minutesToDuration(props.breakTime)} minutes
+        On Break for {minutesToDuration(breakTime)} minutes
       </h2>
       <p className="lead" data-testid="session-sub-title">
-        {secondsToDuration(props.breakTimeInSeconds)} remaining
+        {secondsToDuration(breakTimeInSeconds)} remaining
       </p>
     </div>
   );
-   }
 }

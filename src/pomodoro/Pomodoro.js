@@ -24,15 +24,15 @@ export default function Pomodoro() {
   const shouldDisable = (state) => (state ? true : false);
   const disableButtons = isTimerRunning || pomodoro.paused;
 
-  // Breaktimer Buttons
+  // Breaktimer Buttons, because I wanted const, instead of let ourside of the if, and set inside
   const tenaryButton = (operation, vars) => {
-    let baseTime = vars ? pomodoro.breakTime : pomodoro.focusTime;
-    let increment = vars ? 1 : 5;
-    let [max, min] = vars ? [1, 15] : [5, 60];
-    let newTime = operation
+    const baseTime = vars ? pomodoro.breakTime : pomodoro.focusTime;
+    const increment = vars ? 1 : 5;
+    const [max, min] = vars ? [1, 15] : [5, 60];
+    const newTime = operation
       ? Math.min(min, baseTime + increment)
       : Math.max(max, baseTime - increment);
-    let newObj = vars
+    const newObj = vars
       ? {
           breakTime: newTime,
           breakTimeInSeconds: newTime * 60,
@@ -45,17 +45,18 @@ export default function Pomodoro() {
   };
 
   // Function for the play and pause button
+  // You only have yourself to blame, I learned it from watching you dad
   function playPause() {
+    const newObj = !isTimerRunning
+      ? { paused: true, stopped: false }
+      : !isTimerRunning && !pomodoro.paused
+      ? {
+          timeinSeconds: pomodoro.focusTime * 60,
+          breakTimeInSeconds: pomodoro.breakTime * 60,
+        }
+      : { ...pomodoro };
+    pushVar(newObj);
     setIsTimerRunning((prevState) => !prevState);
-    if (!isTimerRunning && !pomodoro.paused) {
-      pushVar({
-        timeinSeconds: pomodoro.focusTime * 60,
-        breakTimeInSeconds: pomodoro.breakTime * 60,
-      });
-    }
-    if (!isTimerRunning) {
-      pushVar({ paused: true, stopped: false });
-    }
   }
 
   // stop Button function
@@ -72,7 +73,7 @@ export default function Pomodoro() {
   const runTimer = () => {
     const newTime = pomodoro.timeInSeconds - 1;
     const newBreakTime = pomodoro.breakTimeInSeconds - 1;
-    const runAudio = (!newTime | !newBreakTime) ? true : false
+    const runAudio = !newTime | !newBreakTime ? true : false;
     const newObj =
       isTimerRunning && pomodoro.paused && pomodoro.timeInSeconds > 0
         ? {
