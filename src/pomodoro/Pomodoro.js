@@ -32,14 +32,14 @@ export default function Pomodoro() {
 
   // Button functions for increase and decrease
   // Focustimer buttons
-  const increaseTimerTime = () => {
+  const FocusButtonIncrease = () => {
     let newTime = Math.min(60, focusTime + 5)
     setfocusTime(newTime)
     focusTimeTimeDisplay(newTime)
     secondsTimerDisplay(newTime)
   }
 
-  const decreaseTimertime = () => {
+  const FocusButtonDecrease = () => {
     let newTime = Math.max(5, focusTime - 5)
     setfocusTime(newTime)
     focusTimeTimeDisplay(newTime)
@@ -47,13 +47,13 @@ export default function Pomodoro() {
   }
 
   // Breaktimer Buttons
-  const increaseBreakTime = () => {
+  const breaktimeButtonIncrease = () => {
     let newTime = Math.min(15, breakTime + 1)
     setBreakTime(newTime)
     breakTimerDisplay(newTime)
     secondsBreakDisplay(newTime)
   }
-  const decreaseBreakTime = () => {
+  const breaktimeButtondecrease = () => {
     let newTime = Math.max(1, breakTime - 1)
     setBreakTime(newTime)
     breakTimerDisplay(newTime)
@@ -124,7 +124,7 @@ export default function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="decrease-focus"
-                onClick={decreaseTimertime}
+                onClick={FocusButtonDecrease}
                 disabled={shouldDisable(disableButtons)}
               >
                 <span className="oi oi-minus" />
@@ -133,7 +133,7 @@ export default function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="increase-focus"
-                onClick={increaseTimerTime}
+                onClick={FocusButtonIncrease}
                 disabled={shouldDisable(disableButtons)}
               >
                 <span className="oi oi-plus" />
@@ -152,7 +152,7 @@ export default function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="decrease-break"
-                  onClick={decreaseBreakTime}
+                  onClick={breaktimeButtondecrease}
                   disabled={shouldDisable(disableButtons)}
                 >
                   <span className="oi oi-minus" />
@@ -161,7 +161,7 @@ export default function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="increase-break"
-                  onClick={increaseBreakTime}
+                  onClick={breaktimeButtonIncrease}
                   disabled={shouldDisable(disableButtons)}
                 >
                   <span className="oi oi-plus" />
