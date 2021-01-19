@@ -15,6 +15,7 @@ export default function DisplayTimer(props) {
     paused,
   } = props;
 
+  // Easier to have this entire area as a jsx fragment, that was it can be displayed or not based on conditionals
   return !stopped && paused && breakTimeInSeconds > 0 ? (
     <div>
       <div className="row mb-2">

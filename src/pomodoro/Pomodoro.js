@@ -5,6 +5,7 @@ import useInterval from "../utils/useInterval";
 import { minutesToDuration, secondsToDuration } from "../utils/duration/index.js"
 
 export default function Pomodoro() {
+  // All managed States
   const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
   const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
   const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
@@ -19,6 +20,7 @@ export default function Pomodoro() {
   const [paused, setPaused] = useState(false)
   const [valueNow, setValueNow] = useState(0)
 
+  // Generic functions to make it easier to call on certain changes multiple times
   const timePercentage = (currentTime, absoluteTime) => setValueNow(100 -(currentTime * 100) / (absoluteTime * 60))
   const secondsBreakDisplay = (time) => setBreakTimeInSecondsDisplay(secondsToDuration(time))
   const secondsTimerDisplay = (time) => setTimeInSecondsDisplay(secondsToDuration(time))
@@ -28,6 +30,8 @@ export default function Pomodoro() {
   const convertTimeToSeconds = (time) => time * 60
   const disableButtons = isTimerRunning || paused
 
+  // Button functions for increase and decrease
+  // Focustimer buttons
   const increaseTimerTime = () => {
     let newTime = Math.min(60, focusTime + 5)
     setfocusTime(newTime)
@@ -42,6 +46,7 @@ export default function Pomodoro() {
     secondsTimerDisplay(newTime)
   }
 
+  // Breaktimer Buttons
   const increaseBreakTime = () => {
     let newTime = Math.min(15, breakTime + 1)
     setBreakTime(newTime)
@@ -55,6 +60,7 @@ export default function Pomodoro() {
     secondsBreakDisplay(newTime)
   }
 
+  // Function for the play and pause button
   function playPause() {
     setIsTimerRunning((prevState) => !prevState);
     if (!isTimerRunning && !paused) {
@@ -65,12 +71,14 @@ export default function Pomodoro() {
     setStopped(false)
   }
 
+  // stop Button function
   const stopButton = () => {
     setStopped(true)
     setIsTimerRunning(false)
     setPaused(false)
   }
 
+  // Main logic behind counter
   useInterval(
     () => {
       if (isTimerRunning && paused && timeInSeconds > 0) {

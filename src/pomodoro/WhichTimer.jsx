@@ -9,6 +9,7 @@ export default function WhichTimer(props) {
     timeInSeconds,
   } = props;
 
+  // Conditional that chooses whether to display focus timer or break timer
   return timeInSeconds !== 0 ? (
     <div className="col">
       <h2 data-testid="session-title">
