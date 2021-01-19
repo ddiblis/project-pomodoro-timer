@@ -4,7 +4,7 @@ import WhichTimer from "./WhichTimer";
 export default function DisplayTimer(props) {
   const { breakTimeInSeconds, percentage, valueNow, stopped, paused } = props;
 
-  // Easier to have this entire area as a jsx fragment, that was it can be displayed or not based on conditionals
+// Found it better to have this part of the code with 2 fragments, makes it easier to track the conditionals. 
   return !stopped && paused && breakTimeInSeconds > 0 ? (
     <div>
       <div className="row mb-2">

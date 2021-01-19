@@ -21,6 +21,8 @@ export default function Pomodoro() {
   const pushVar = (values) => {
     setPomodoro({ ...pomodoro, ...values });
   };
+
+  //Generic functions
   const shouldDisable = (state) => (state ? true : false);
   const disableButtons = isTimerRunning || pomodoro.paused;
 
