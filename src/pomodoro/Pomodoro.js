@@ -1,19 +1,20 @@
 import React, { useState } from "react";
+import DisplayTimer from "./DisplayTimer"
 import classNames from "../utils/class-names";
 import useInterval from "../utils/useInterval";
 import { minutesToDuration, secondsToDuration } from "../utils/duration/index.js"
 
-function Pomodoro() {
+export default function Pomodoro() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [paused, setPaused] = useState(false)
   const [stopped, setStopped] = useState(false)
-  const [timer, setTimer] = useState(25)
+  const [paused, setPaused] = useState(false)
+  const [focusTime, setfocusTime] = useState(25)
   const [breakTime, setBreakTime] = useState(5)
-  const [timerDisplay, setTimerDisplay] = useState("25:00")
+  const [focusTimeDisplay, setFocusTimeDisplay] = useState("25:00")
   const [breakTimeDisplay, setBreakTimeDisplay] = useState("05:00")
-  const [timeInSeconds, setTimeinSeconds] = useState(timer * 60)
-  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
+  const [timeInSeconds, setTimeinSeconds] = useState(focusTime * 60)
   const [breakTimeInSeconds, setbreakTimeInSeconds] = useState(breakTime * 60)
+  const [timeInSecondsDisplay, setTimeInSecondsDisplay] = useState(secondsToDuration(timeInSeconds))
   const [breakTimeInSecondsDisplay, setBreakTimeInSecondsDisplay] = useState(secondsToDuration(breakTimeInSeconds))
   const [valueNow, setValueNow] = useState(0)
   const [percentage, setPercentage] = useState(`${valueNow}%`)
@@ -22,11 +23,11 @@ function Pomodoro() {
   //   isTimerRunning: false,
   //   paused: false,
   //   stopped: false,
-  //   timer: 25,
+  //   focusTime: 25,
   //   breakTime: 5,
-  //   timerDisplay: "25:00",
+  //   focusTimeDisplay: "25:00",
   //   breakTimerDisplay: "5:00",
-  //   timeInSeconds: timer*60,
+  //   timeInSeconds: focusTime*60,
   //   timeInSecondsDisplay: secondsToDuration(timeInSeconds),
   //   breakTimeInSeconds: breakTime*60,
   //   breakTimeInSecondsDisplay: secondsToDuration(breakTimeInSeconds),
@@ -34,26 +35,17 @@ function Pomodoro() {
   //   percentage: `${valueNow}%`
   // }
 
-  // const [timerData, setTimerData] = useState({...initialStates})
+  // const [focusTimeData, setfocusTimeData] = useState({...initialStates})
 
   // const handleChange = ({target}) => {
-  //   return setTimerData({
-  //         ...timerData,
+  //   return setfocusTimeData({
+  //         ...focusTimeData,
   //         [target.name]: target.value
   //   })
   // }
 
 
 
-  function playPause() {
-    setIsTimerRunning((prevState) => !prevState);
-    if (!isTimerRunning && !paused) {
-      setTimeinSeconds(convertTimeToSeconds(timer))
-      setbreakTimeInSeconds(convertTimeToSeconds(breakTime))
-    }
-    if (!isTimerRunning) setPaused(true)
-    setStopped(false)
-  }
 
   useInterval(
     () => {
@@ -61,8 +53,11 @@ function Pomodoro() {
       const newTime = timeInSeconds - 1
       setTimeinSeconds(newTime)
       secondsTimerDisplay(newTime)
-      timePercentage(newTime, timer)
+      timePercentage(newTime, focusTime)
       setPercentage(`${valueNow}%`)
+        if (newTime === 0) {
+          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        }
       } 
       else if (breakTimeInSeconds > 0) {
         const newBreakTime = breakTimeInSeconds - 1
@@ -70,18 +65,21 @@ function Pomodoro() {
         secondsBreakDisplay(newBreakTime)
         timePercentage(newBreakTime, breakTime)
         setPercentage(`${valueNow}%`)
+        if (newBreakTime === 0) {
+          new Audio(`${process.env.PUBLIC_URL}/alarm/submarine-dive-horn.mp3`).play();
+        }
       }
       else {
-        setTimer(timer)
+        setfocusTime(focusTime)
         setBreakTime(breakTime)
-        setTimeinSeconds(timer)
+        setTimeinSeconds(focusTime)
         setbreakTimeInSeconds(breakTime)
       }
     },
     isTimerRunning ? 1000 : null
   );
 
-  const timerTimeDisplay = (time) => setTimerDisplay(minutesToDuration(time))
+  const focusTimeTimeDisplay = (time) => setFocusTimeDisplay(minutesToDuration(time))
   const breakTimerDisplay = (time) => setBreakTimeDisplay(minutesToDuration(time))
   const secondsTimerDisplay = (time) => setTimeInSecondsDisplay(secondsToDuration(time))
   const secondsBreakDisplay = (time) => setBreakTimeInSecondsDisplay(secondsToDuration(time))
@@ -90,17 +88,16 @@ function Pomodoro() {
   const disableButtons = isTimerRunning || paused
 
   const increaseTimerTime = () => {
-    let newTime = Math.min(60, timer + 5)
-    setTimer(newTime)
-    timerTimeDisplay(newTime)
+    let newTime = Math.min(60, focusTime + 5)
+    setfocusTime(newTime)
+    focusTimeTimeDisplay(newTime)
     secondsTimerDisplay(newTime)
   }
 
   const decreaseTimertime = () => {
-    let newTime = timer - 5
-    newTime = Math.max(5, newTime)
-    setTimer(newTime)
-    timerTimeDisplay(newTime)
+    let newTime = Math.max(5, focusTime - 5)
+    setfocusTime(newTime)
+    focusTimeTimeDisplay(newTime)
     secondsTimerDisplay(newTime)
   }
 
@@ -117,6 +114,16 @@ function Pomodoro() {
     secondsBreakDisplay(newTime)
   }
 
+  function playPause() {
+    setIsTimerRunning((prevState) => !prevState);
+    if (!isTimerRunning && !paused) {
+      setTimeinSeconds(convertTimeToSeconds(focusTime))
+      setbreakTimeInSeconds(convertTimeToSeconds(breakTime))
+    }
+    if (!isTimerRunning) setPaused(true)
+    setStopped(false)
+  }
+
   const stopButton = () => {
     setStopped(true)
     setIsTimerRunning(false)
@@ -125,52 +132,13 @@ function Pomodoro() {
 
   const shouldDisable = (state) => state ? true : false
 
-  const WhichTimer = () => timeInSeconds !== 0 ? (
-        <div className="col">
-          <h2 data-testid="session-title">Focusing for {timerDisplay} minutes</h2>
-          <p className="lead" data-testid="session-sub-title">
-            {timeInSecondsDisplay} remaining
-            </p>
-        </div>
-) : (   <div className="col">
-          <h2 data-testid="session-title">On Break for {breakTimeDisplay} minutes</h2>
-          <p className="lead" data-testid="session-sub-title">
-            {breakTimeInSecondsDisplay} remaining
-            </p>
-        </div>
-    )
-
-  const DisplayTimer = () => !stopped && paused && breakTimeInSeconds > 0 ? (
-    <div>
-      <div className="row mb-2">
-        <WhichTimer />
-      </div>
-      <div className="row mb-2">
-        <div className="col">
-          <div className="progress" style={{ height: "20px" }}>
-            <div
-              className="progress-bar"
-              role="progressbar"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow={valueNow} 
-              style={{ width: percentage }} 
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
-      <div>
-      </div>)
-
   return (
     <div className="pomodoro">
       <div className="row">
         <div className="col">
           <div className="input-group input-group-lg mb-2">
             <span className="input-group-text" data-testid="duration-focus">
-              Focus Duration: {timerDisplay}
+              Focus Duration: {focusTimeDisplay}
             </span>
             <div className="input-group-append">
               <button
@@ -235,7 +203,7 @@ function Pomodoro() {
               type="button"
               className="btn btn-primary"
               data-testid="play-pause"
-              title="Start or pause timer"
+              title="Start or pause focusTime"
               onClick={playPause}
             >
               <span
@@ -258,9 +226,7 @@ function Pomodoro() {
           </div>
         </div>
       </div>
-      <DisplayTimer />
+      <DisplayTimer timeInSeconds={timeInSeconds} focusTimeDisplay={focusTimeDisplay} timeInSecondsDisplay={timeInSecondsDisplay} breakTimeDisplay={breakTimeDisplay} breakTimeInSecondsDisplay={breakTimeInSecondsDisplay} valueNow={valueNow} percentage={percentage} stopped={stopped} paused={paused} breakTimeInSeconds={breakTimeInSeconds}/>
     </div>
   );
 }
-
-export default Pomodoro;
